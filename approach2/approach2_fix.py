@@ -54,7 +54,11 @@ def test(alg, num_arms, num_trials, num_steps, true_means):
                 reward = 0.0
             alg.update(chosen_arm, reward)
             rewards[n] = rewards[n] + reward
-            regret = s * max(true_means) - rewards[n]
+            #regret = s * max(true_means) - rewards[n]
+            if chosen_arm == alg.best_action():
+                regret = 0.0
+            else:
+                regret = abs(max(true_means) - (rewards[n]/s))
             regrets[n][s] = regret
             total_rewards[n][s] = reward
     n_steps = np.linspace(0, num_steps, num_steps)
