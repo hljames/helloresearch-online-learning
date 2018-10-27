@@ -9,8 +9,9 @@ class Solution():
         self.p = p
 
     def init_vals(self, num_arms):
-        self.vals = np.zeros(num_arms)
-        self.counts = np.zeros(num_arms) # could just make this an int array
+        n = num_arms + 1
+        self.vals = np.zeros(n)
+        self.counts = np.zeros(n) # could just make this an int array
 
     def best_action(self, vals):
         return vals.argmax()
@@ -37,7 +38,8 @@ class Solution():
 
 def test(alg, num_arms, num_trials, num_steps, true_means):
     #cumulative_reward = np.zeros()
-    rewards = np.zeros(num_arms)
+    n = num_arms + 1
+    rewards = np.zeros(n)
     arms = np.zeros((num_trials, num_steps))
 
     for n in range(num_trials):
@@ -48,6 +50,8 @@ def test(alg, num_arms, num_trials, num_steps, true_means):
             arms[n][s] = chosen_arm
             i = random.random()
             if i < true_means[chosen_arm]:
+                print('i is', i)
+                print('chosen arm is', chosen_arm)
                 reward = 1.0
             else:
                 reward = 0.0
@@ -59,7 +63,8 @@ def main():
     num_trials = 10
     num_steps = 1000
     true_means = [0.5, 0.8]
-    num_arms = len(true_means)
+    num_arms = len(true_means) - 1
+    print('num arms is', num_arms)
     p = 0.2 # fixed value for now - can vary later
     alg = Solution([], p, [])
     alg.init_vals(num_arms)
@@ -68,3 +73,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
