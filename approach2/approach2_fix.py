@@ -15,7 +15,7 @@ class Solution():
 
     def best_action(self, vals):
         return vals.argmax()
-    
+
     def choose_arm(self, num_arms):
         r = random.random()
         if r < self.p:
@@ -38,8 +38,7 @@ class Solution():
 
 def test(alg, num_arms, num_trials, num_steps, true_means):
     total_rewards = np.zeros((num_trials, num_steps))
-    n = num_arms + 1
-    rewards = np.zeros(n)
+    rewards = np.zeros(num_trials)
     arms = np.zeros((num_trials, num_steps))
     regrets = np.zeros((num_trials, num_steps))
 
@@ -54,28 +53,30 @@ def test(alg, num_arms, num_trials, num_steps, true_means):
             else:
                 reward = 0.0
             alg.update(chosen_arm, reward)
-            rewards[chosen_arm] = reward
-            regret = rewards.sum() / s
+            rewards[n] = rewards[n] + reward
+            regret = s * max(true_means) - rewards[n]
             regrets[n][s] = regret
             total_rewards[n][s] = reward
-            s = s + 1
-        n = n + 1
-    return [num_trials, num_steps, arms, rewards, regrets, total_rewards]
+    n_steps = np.linspace(0, num_steps, num_steps)
+    return [num_trials, n_steps, arms, rewards, regrets, total_rewards]
 
 def main():
     num_trials = 10
-    num_steps = 1000
+    num_steps = 100
     true_means = [0.9, 0.5]
     num_arms = len(true_means) - 1
-    print('num arms is', num_arms)
     p = 0.2 # fixed value for now - can vary later
     alg = Solution([], p, [])
     alg.init_vals(num_arms)
     results = test(alg, num_arms, num_trials, num_steps, true_means)
+    regrets = results[4]
     # plot the results -- not sure how to do this
     fig,ax = plt.subplots()
     regret = regrets[0]
-    ax.scatter(results[1], regret)
+    x = results[1]
+    print(x)
+    print(len(regret))
+    ax.scatter(x, regret)
     ax.set_title("Regret over time")
     ax.set_xlabel("Number of steps")
     ax.set_ylabel("Regret")
@@ -84,4 +85,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
+
