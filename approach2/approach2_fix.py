@@ -1,5 +1,5 @@
 import random
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 
 class Solution():
@@ -73,6 +73,13 @@ def main():
     alg.init_vals(num_arms)
     results = test(alg, num_arms, num_trials, num_steps, true_means)
     # plot the results -- not sure how to do this
+    fig,ax = plt.subplots()
+    regret = regrets[0]
+    ax.scatter(results[1], regret)
+    ax.set_title("Regret over time")
+    ax.set_xlabel("Number of steps")
+    ax.set_ylabel("Regret")
+    plt.show()
 
 if __name__ == "__main__":
     main()
