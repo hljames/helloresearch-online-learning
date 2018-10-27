@@ -1,4 +1,6 @@
 import random
+#import matplotlib.pyplot as plt
+import numpy as np
 
 class Solution():
     def __init__(self, vals, p, counts):
@@ -7,20 +9,19 @@ class Solution():
         self.p = p
 
     def init_vals(self, num_arms):
-        self.vals = [0.0] * num_arms
-        self.counts = [0] * num_arms
+        self.vals = np.zeros(num_arms)
+        self.counts = np.zeros(num_arms) # could just make this an int array
 
     def best_action(self, vals):
-        best = max(vals)
-        return vals.index(best)
+        return vals.argmax()
     
-    def choose_arm(self):
-        r = random.random(0,1)
+    def choose_arm(self, num_arms):
+        r = random.random()
         if r < self.p:
-            return random.randint(0,1)
+            return random.randint(0, num_arms)
         else:
             # return the maximum expected value
-            return best_action(self.vals)
+            return self.best_action(self.vals)
 
     def update(self, arm, actual_reward):
         # update counts
@@ -30,21 +31,40 @@ class Solution():
         # update value
         val = self.vals[arm]
         # calculate new value
-        new_val = 1 # TODO: update with actual calculation of new value - prob want to weight it based on n
+        new_val = ((n - 1) / float(n)) * val + (1 / float(n)) * actual_reward
         self.vals[arm] = new_val
         return
 
-'''
-set the real rewards
-set the true distributions 
+def test(alg, num_arms, num_trials, num_steps, true_means):
+    #cumulative_reward = np.zeros()
+    rewards = np.zeros(num_arms)
+    arms = np.zeros((num_trials, num_steps))
 
-init stuff 
-for each trial in trials:
-       choose_action
-       get_reward 
-       update based on arm and reward
+    for n in range(num_trials):
+        n = n + 1
+        alg.init_vals(num_arms)
+        for s in range(num_steps):
+            chosen_arm = alg.choose_arm(num_arms)
+            arms[n][s] = chosen_arm
+            i = random.random()
+            if i < true_means[chosen_arm]:
+                reward = 1.0
+            else:
+                reward = 0.0
+            alg.update(chosen_arm, reward)
+            rewards[chosen_arm] = reward
+    return [num_trials, num_steps, arms, rewards]
 
-record results somewhere
-plot results
-'''
+def main():
+    num_trials = 10
+    num_steps = 1000
+    true_means = [0.5, 0.8]
+    num_arms = len(true_means)
+    p = 0.2 # fixed value for now - can vary later
+    alg = Solution([], p, [])
+    alg.init_vals(num_arms)
+    results = test(alg, num_arms, num_trials, num_steps, true_means)
+    # plot the results -- not sure how to do this
 
+if __name__ == "__main__":
+    main()
