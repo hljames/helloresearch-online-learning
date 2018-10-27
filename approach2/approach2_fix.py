@@ -37,32 +37,35 @@ class Solution():
         return
 
 def test(alg, num_arms, num_trials, num_steps, true_means):
-    #cumulative_reward = np.zeros()
+    total_rewards = np.zeros((num_trials, num_steps))
     n = num_arms + 1
     rewards = np.zeros(n)
     arms = np.zeros((num_trials, num_steps))
+    regrets = np.zeros((num_trials, num_steps))
 
     for n in range(num_trials):
-        n = n + 1
         alg.init_vals(num_arms)
         for s in range(num_steps):
             chosen_arm = alg.choose_arm(num_arms)
             arms[n][s] = chosen_arm
             i = random.random()
             if i < true_means[chosen_arm]:
-                print('i is', i)
-                print('chosen arm is', chosen_arm)
                 reward = 1.0
             else:
                 reward = 0.0
             alg.update(chosen_arm, reward)
             rewards[chosen_arm] = reward
-    return [num_trials, num_steps, arms, rewards]
+            regret = rewards.sum() / s
+            regrets[n][s] = regret
+            total_rewards[n][s] = reward
+            s = s + 1
+        n = n + 1
+    return [num_trials, num_steps, arms, rewards, regrets, total_rewards]
 
 def main():
     num_trials = 10
     num_steps = 1000
-    true_means = [0.5, 0.8]
+    true_means = [0.9, 0.5]
     num_arms = len(true_means) - 1
     print('num arms is', num_arms)
     p = 0.2 # fixed value for now - can vary later
